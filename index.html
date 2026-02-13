@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>for raaji</title>
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #E2DAF7;
+            color: #333;
+            font-family: 'Indie Flower', cursive; 
+            letter-spacing: 0.5px; 
+            font-weight: 900; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* --- PAGE 0: THE COVER --- */
+        #page-0 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            transition: opacity 0.5s ease-in-out;
+            position: relative;
+            z-index: 100;
+        }
+
+        @keyframes boxFlyIn {
+            0% { transform: translateY(-100vh) rotate(-20deg) scale(0.5); opacity: 0; }
+            60% { transform: translateY(20px) rotate(10deg) scale(1.1); opacity: 1; }
+            80% { transform: translateY(-10px) rotate(-5deg) scale(0.95); }
+            100% { transform: translateY(0) rotate(0deg) scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 70% { transform: rotate(0deg); }
+            75% { transform: rotate(2deg) translateX(2px); }
+            80% { transform: rotate(-2deg) translateX(-2px); }
+            85% { transform: rotate(2deg) translateX(2px); }
+            90% { transform: rotate(-2deg) translateX(-2px); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .closed-box-container {
+            position: relative;
+            width: 384px; 
+            max-width: 90vw;
+            animation: boxFlyIn 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transition: transform 0.2s ease;
+        }
+
+        .box-inner-wrapper {
+            animation: shake 1.5s ease-in-out infinite 1.2s;
+        }
+
+        .closed-box-container:active { transform: scale(0.95); }
+        #closed-box-img { width: 100%; height: auto; display: block; }
+
+        .sticker-style {
+            background-color: #FDF1E3;
+            color: #8A7DBA;
+            border: 3px dashed #8A7DBA;
+            border-radius: 4px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+            white-space: nowrap;
+            pointer-events: none;
+            text-shadow: 0.5px 0.5px 0px rgba(0,0,0,0.1);
+        }
+
+        .sticker {
+            position: absolute;
+            top: 55%; 
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-5deg);
+            padding: 14px 24px;
+            font-size: 34px;
+            z-index: 5;
+        }
+
+        /* --- PAGE 1: THE PETTING --- */
+        #page-1 {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            transition: opacity 0.5s ease-in-out;
+            position: relative;
+            opacity: 0;
+        }
+
+        .box-container {
+            position: relative;
+            width: 380px;
+            max-width: 95vw;
+            z-index: 10; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .rishi-label {
+            position: absolute;
+            top: -125px; 
+            right: 5%; 
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0; 
+            transition: opacity 0.6s ease-out;
+        }
+
+        .rishi-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(5deg);
+            padding-bottom: 8px;
+        }
+
+        .rishi-text { color: #8A7DBA; font-size: 32px; line-height: 1; }
+
+        .rishi-arrow { 
+            margin-top: -10px; 
+            margin-left: -5px; 
+            transform: rotate(-5deg); 
+        }
+
+        #cat-img {
+            position: absolute;
+            bottom: 20%; 
+            left: 50%;
+            width: 90%; 
+            transform: translateX(-50%) translateY(80px); 
+            z-index: 11; 
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        #box-img { width: 100%; height: auto; display: block; position: relative; z-index: 12; pointer-events: none; }
+
+        .box-label {
+            position: absolute;
+            bottom: 22%; 
+            left: 50%;
+            transform: translateX(-50%) rotate(-6deg);
+            padding: 10px 16px; 
+            font-size: 26px; 
+            line-height: 1.1;
+            z-index: 13;
+            text-transform: lowercase; 
+        }
+
+        .click-blocker {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 48%; 
+            z-index: 14; 
+            background: transparent;
+        }
+
+        /* --- PAGE 2: THE REVEAL --- */
+        #page-2 {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            position: relative;
+            z-index: 10;
+        }
+
+        #bouquet-cat-img { width: 380px; max-width: 95%; margin-top: 40px; margin-bottom: 15px; pointer-events: none;}
+        
+        .final-message { 
+            font-size: 26px; 
+            color: #825C94; 
+            line-height: 1.2; 
+            margin-bottom: 10px;
+            min-height: 80px; 
+            pointer-events: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px; 
+        }
+
+        .word {
+            opacity: 0;
+            transform: translateY(10px);
+            display: inline-block;
+        }
+
+        .word-fade-up {
+            animation: wordFadeUp 0.6s forwards ease-out;
+        }
+
+        @keyframes wordFadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .signature-heart-container {
+            align-self: flex-end;
+            margin-right: 40px;
+            width: 60px;
+            height: 60px;
+            pointer-events: none;
+            opacity: 0; 
+            transition: opacity 0.5s ease;
+        }
+
+        .heart-path {
+            stroke-dasharray: 600;
+            stroke-dashoffset: 600;
+            fill: transparent;
+            transition: fill 0.5s ease 1s; 
+        }
+
+        .draw-heart { animation: draw 1.5s forwards ease-in-out; }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+        
+        @keyframes pulse-simple {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        .pulse { animation: pulse-simple 2s infinite ease-in-out; }
+
+        #replay-link {
+            margin-top: 55px; 
+            font-size: 24px;
+            color: #FF69B4;
+            border-bottom: 5px solid #FF69B4; 
+            display: inline-block;
+            opacity: 0;
+            cursor: pointer;
+            transition: opacity 1.5s ease;
+            z-index: 100;
+        }
+
+        @keyframes link-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .scale-link {
+            animation: link-scale 2.5s infinite ease-in-out;
+        }
+
+        /* --- HEART STYLES --- */
+        .heart-svg { position: absolute; pointer-events: none; will-change: transform, opacity; }
+        .tap-heart { fill: #FF69B4; z-index: 200; animation: burst 0.7s ease-out forwards; }
+        @keyframes burst {
+            0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(1.4); opacity: 0; }
+        }
+        .bg-heart { fill: #cfc0f5; z-index: 1; animation: rise var(--duration) linear forwards; }
+        @keyframes rise {
+            0% { transform: translateY(0) scale(2.4); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-115vh) scale(1.8); opacity: 0.8; }
+        }
+    </style>
+</head>
+<body onclick="spawnGlobalHearts(event)">
+
+    <template id="heart-template">
+        <svg class="heart-svg" viewBox="0 0 32 32" width="30" height="30">
+            <path d="M16 28.5L14.1 26.7C7.3 20.6 2.8 16.5 2.8 11.5C2.8 7.4 6 4.2 10.1 4.2C12.4 4.2 14.6 5.3 16 7C17.4 5.3 19.6 4.2 21.9 4.2C26 4.2 29.2 7.4 29.2 11.5C29.2 16.5 24.7 20.6 17.9 26.7L16 28.5Z"/>
+        </svg>
+    </template>
+
+    <div id="page-0" onclick="openAndBurst(event)">
+        <div class="closed-box-container">
+            <div class="box-inner-wrapper">
+                <img src="closed-box.png" id="closed-box-img" alt="Closed Box">
+                <div class="sticker sticker-style">for raaji</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-1">
+        <div class="box-container">
+            <div class="rishi-label" id="rishi-label">
+                <div class="rishi-header">
+                    <span class="rishi-text">rishi :)</span>
+                </div>
+                <svg class="rishi-arrow" width="100" height="100" viewBox="0 0 100 100" fill="none" stroke="#8A7DBA" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M 85 10 Q 75 60 20 85" />
+                    <path d="M 20 85 L 40 82 M 20 85 L 28 65" />
+                </svg>
+            </div>
+            <img id="cat-img" src="cat.png" alt="Orange Cat" onclick="petAndHearts(event)">
+            <img id="box-img" src="box.png" alt="Cardboard Box">
+            <div class="box-label sticker-style" id="tape-text">pet me!</div>
+            <div class="click-blocker"></div> 
+        </div>
+    </div>
+
+    <div id="page-2">
+        <img id="bouquet-cat-img" src="cat-bouquet.png" alt="Cat with Bouquet">
+        <div class="final-message" id="message-container"></div>
+        
+        <div class="signature-heart-container" id="heart-container">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path class="heart-path" id="drawing-path" stroke="#FF69B4" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"
+                d="M100,180 Q10,140 10,70 Q10,20 60,20 Q100,20 100,60 Q100,20 140,20 Q190,20 190,70 Q190,140 100,180 Z" />
+            </svg>
+        </div>
+
+        <div id="replay-link" onclick="resetGift(event)">click here to pet rishi again hehe</div>
+    </div>
+
+    <script>
+        let taps = 0;
+        let canPet = true;
+        let currentScreen = 0; 
+        let heartInterval;
+        const message = "I know we aren't in the same city right now, but I still wanted to make sure you got some flowers today. Just a little something to make you smile.";
+        const template = document.getElementById('heart-template');
+
+        function createHeart(x, y, isBackground) {
+            const heart = template.content.firstElementChild.cloneNode(true);
+            let duration;
+            if (isBackground) {
+                heart.classList.add('bg-heart');
+                heart.style.left = Math.random() * 100 + "vw";
+                heart.style.bottom = `-${Math.random() * 100}px`;
+                duration = 1.0 + Math.random() * 0.8;
+                heart.style.setProperty('--duration', `${duration}s`);
+                heart.style.width = "50px"; heart.style.height = "50px";
+            } else {
+                heart.classList.add('tap-heart');
+                heart.style.left = (x - 15) + "px"; 
+                heart.style.top = (y - 15) + "px";
+                heart.style.setProperty('--x', (Math.random() * 260 - 130) + "px");
+                heart.style.setProperty('--y', (Math.random() * -260 - 80) + "px");
+                duration = 0.7;
+            }
+            document.body.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, duration * 1000);
+        }
+
+        function spawnGlobalHearts(event) {
+            if (currentScreen === 2) {
+                for(let i=0; i<6; i++) createHeart(event.clientX, event.clientY, false);
+                for(let i=0; i<6; i++) createHeart(0, 0, true);
+            }
+        }
+
+        function openAndBurst(event) {
+            event.stopPropagation();
+            for(let i=0; i<8; i++) createHeart(event.clientX, event.clientY, false);
+            for(let i=0; i<6; i++) createHeart(0, 0, true);
+            openGift();
+        }
+
+        function petAndHearts(event) {
+            event.stopPropagation(); 
+            if (!canPet) return;
+            for(let i=0; i<8; i++) createHeart(event.clientX, event.clientY, false);
+            for(let i=0; i<6; i++) createHeart(0, 0, true);
+            petCat();
+        }
+
+        function openGift() {
+            currentScreen = 1;
+            document.getElementById("page-0").style.opacity = 0;
+            setTimeout(() => {
+                document.getElementById("page-0").style.display = "none";
+                document.getElementById("page-1").style.display = "flex";
+                setTimeout(() => { document.getElementById("page-1").style.opacity = 1; }, 50);
+            }, 500);
+        }
+
+        function revealMessage() {
+            const container = document.getElementById("message-container");
+            container.innerHTML = ""; 
+            const words = message.split(" ");
+            
+            words.forEach((word, index) => {
+                const span = document.createElement("span");
+                span.textContent = word;
+                span.className = "word";
+                container.appendChild(span);
+                setTimeout(() => {
+                    span.classList.add("word-fade-up");
+                }, index * 80);
+            });
+
+            setTimeout(startHeartDrawing, (words.length * 80) + 400);
+        }
+
+        function startHeartDrawing() {
+            const container = document.getElementById('heart-container');
+            const path = document.getElementById('drawing-path');
+            const replay = document.getElementById('replay-link');
+            
+            container.style.opacity = "1";
+            path.classList.add('draw-heart');
+            
+            setTimeout(() => {
+                path.style.fill = "#FF69B4";
+                container.classList.add('pulse');
+
+                setTimeout(() => {
+                    replay.style.opacity = "1"; 
+                    replay.classList.add('scale-link');
+                }, 4000);
+
+                heartInterval = setInterval(() => {
+                    if(currentScreen === 2) createHeart(0, 0, true);
+                }, 700);
+            }, 1500);
+        }
+
+        function resetGift(event) {
+            event.stopPropagation();
+            if (heartInterval) clearInterval(heartInterval);
+            currentScreen = 0;
+            taps = 0;
+            canPet = true;
+
+            const p0 = document.getElementById("page-0");
+            const p1 = document.getElementById("page-1");
+            const p2 = document.getElementById("page-2");
+            const catImg = document.getElementById("cat-img");
+            const tapeText = document.getElementById("tape-text");
+            const rishiLabel = document.getElementById("rishi-label");
+            const heartContainer = document.getElementById("heart-container");
+            const heartPath = document.getElementById("drawing-path");
+
+            p2.style.opacity = 0;
+            setTimeout(() => {
+                p2.style.display = "none";
+                p0.style.display = "flex";
+                catImg.style.transform = "translateX(-50%) translateY(80px)";
+                tapeText.innerHTML = "pet me!";
+                tapeText.style.color = "#8A7DBA";
+                rishiLabel.style.opacity = "0";
+                heartContainer.style.opacity = "0";
+                heartContainer.classList.remove('pulse');
+                heartPath.classList.remove('draw-heart');
+                heartPath.style.fill = "transparent";
+                document.getElementById('replay-link').style.opacity = "0";
+                document.getElementById('replay-link').classList.remove('scale-link');
+                
+                setTimeout(() => { p0.style.opacity = 1; }, 50);
+            }, 500);
+        }
+
+        function petCat() {
+            taps++;
+            const catImg = document.getElementById("cat-img");
+            const tapeText = document.getElementById("tape-text");
+
+            if (taps === 1) {
+                document.getElementById("rishi-label").style.opacity = "1";
+                catImg.style.transform = "translateX(-50%) translateY(50px)";
+                tapeText.innerHTML = "pet me<br>more!";
+            } 
+            else if (taps === 2) {
+                catImg.style.transform = "translateX(-50%) translateY(20px)";
+                tapeText.innerHTML = "almost!";
+            }
+            else if (taps === 3) {
+                canPet = false;
+                catImg.style.transform = "translateX(-50%) translateY(-10px)";
+                tapeText.innerHTML = "meow!";
+                
+                setTimeout(() => {
+                    currentScreen = 2; 
+                    document.getElementById("page-1").style.opacity = 0;
+                    setTimeout(() => {
+                        document.getElementById("page-1").style.display = "none";
+                        document.getElementById("page-2").style.display = "flex";
+                        setTimeout(() => { 
+                            document.getElementById("page-2").style.opacity = 1;
+                            revealMessage();
+                        }, 50);
+                    }, 500);
+                }, 1200); 
+            }
+        }
+    </script>
+</body>
+</html>
