@@ -174,10 +174,10 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: center; /* Center vertically but we use padding to nudge up */
             width: 100%;
             max-width: 500px;
-            padding: 20px;
+            padding: 10px 20px 40px 20px; /* Reduced top padding, more bottom to prevent cutoff */
             box-sizing: border-box;
             opacity: 0;
             transition: opacity 0.8s ease-in-out;
@@ -185,19 +185,19 @@
             z-index: 10;
         }
 
-        #bouquet-cat-img { width: 380px; max-width: 95%; margin-top: 40px; margin-bottom: 15px; pointer-events: none;}
+        #bouquet-cat-img { width: 380px; max-width: 90%; margin-top: 10px; margin-bottom: 10px; pointer-events: none;}
         
         .final-message { 
-            font-size: 26px; 
+            font-size: 24px; 
             color: #825C94; 
-            line-height: 1.2; 
-            margin-bottom: 10px;
-            min-height: 80px; 
+            line-height: 1.1; 
+            margin-bottom: 5px;
+            min-height: 60px; 
             pointer-events: none;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 8px; 
+            gap: 6px; 
         }
 
         .word {
@@ -216,9 +216,9 @@
 
         .signature-heart-container {
             align-self: flex-end;
-            margin-right: 40px;
-            width: 60px;
-            height: 60px;
+            margin-right: 30px;
+            width: 50px;
+            height: 50px;
             pointer-events: none;
             opacity: 0; 
             transition: opacity 0.5s ease;
@@ -241,10 +241,10 @@
         .pulse { animation: pulse-simple 2s infinite ease-in-out; }
 
         #replay-link {
-            margin-top: 55px; 
-            font-size: 24px;
+            margin-top: 30px; /* Reduced to keep it on screen */
+            font-size: 20px;
             color: #FF69B4;
-            border-bottom: 5px solid #FF69B4; 
+            border-bottom: 4px solid #FF69B4; 
             display: inline-block;
             opacity: 0;
             cursor: pointer;
