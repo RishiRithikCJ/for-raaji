@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>tonight's plan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      background-color: #ffd6d6;
+      font-family: 'Indie Flower', cursive;
+      letter-spacing: 0.5px;
+      font-weight: 900;
+      overflow: hidden;
+      position: relative;
+      user-select: none;
+    }
+
+    .scene {
+      display: none;
+      position: absolute;
+      inset: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .scene.active { display: flex; }
+
+    /* ── sticker style (from original) ── */
+    .sticker-style {
+      background-color: #fdf1e3;
+      color: #8a7dba;
+      border: 3px dashed #8a7dba;
+      border-radius: 4px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+      text-shadow: 0.5px 0.5px 0px rgba(0,0,0,0.1);
+    }
+
+    /* ── scene 1 ── */
+    #scene1 img {
+      width: min(72vh, 85vw);
+      cursor: pointer;
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,0.10));
+      animation: idleBounce 0.8s ease-in-out infinite alternate;
+      transform-origin: bottom center;
+    }
+    #scene1 img:active { transform: scale(0.93); }
+
+    /* ── scene 2 ── */
+    #scene2 { opacity: 0; transition: opacity 0.5s ease-in-out; }
+    #scene2.active { opacity: 1; }
+    #scene2 .cat-wrap {
+      width: min(72vh, 85vw);
+      cursor: pointer;
+    }
+    #scene2 .cat-wrap img {
+      width: 100%;
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,0.10));
+    }
+    #scene2 .cat-wrap:active img { transform: scale(0.93); }
+
+    .tap-hint {
+      font-size: 1.7rem;
+      color: #222222;
+      margin-top: 6px;
+      animation: hintScale 1.5s ease-in-out infinite alternate;
+    }
+
+    /* ── scene 3: clipboard ── */
+    #scene3 { opacity: 0; transition: opacity 0.5s ease-in-out; }
+    #scene3.active { opacity: 1; }
+
+    .clipboard-stack {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #img3b {
+      position: absolute;
+      top: 3vh;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 88vh;
+      width: auto;
+      z-index: 1;
+      transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    #img3a {
+      position: absolute;
+      top: 3vh;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 88vh;
+      width: auto;
+      z-index: 2;
+      transition: transform 0.6s cubic-bezier(0.4,0,0.2,1), opacity 0.4s;
+    }
+
+    .checklist-overlay {
+      position: absolute;
+      top: 35vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 58vw;
+      max-width: 320px;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 2.2vh;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .custom-check {
+      min-width: 22px;
+      height: 22px;
+      background-color: #fdf1e3;
+      border: 3px dashed #8a7dba;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .check-item.checked .custom-check {
+      background-color: #8a7dba;
+      border-style: solid;
+      transform: scale(1.15);
+    }
+    .check-item.checked .custom-check::after {
+      content: "✓";
+      color: white;
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .check-label {
+      font-size: 0.95rem;
+      color: #4a2a6a;
+      font-weight: 900;
+      line-height: 1.5;
+    }
+    .check-item.checked .check-label { color: #8a7dba; }
+
+    .sign-area {
+      position: absolute;
+      top: 68vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 52vw;
+      max-width: 300px;
+      height: 80px;
+      z-index: 3;
+      cursor: crosshair;
+      border-bottom: 2.5px dashed #8a7dba;
+    }
+
+    /* ── scene 4 ── */
+    #scene4 { opacity: 0; transition: opacity 0.5s ease-in-out; }
+    #scene4.active { opacity: 1; }
+    #scene4 img {
+      width: min(72vh, 85vw);
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,0.10));
+    }
+
+    /* ── scene 5 ── */
+    #scene5 { opacity: 0; transition: opacity 0.5s ease-in-out; }
+    #scene5.active { opacity: 1; }
+    #scene5 img {
+      width: min(72vh, 85vw);
+      cursor: pointer;
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,0.10));
+      transform-origin: bottom center;
+    }
+    #scene5 img.bouncing {
+      animation: idleBounce 0.8s ease-in-out infinite alternate;
+    }
+    #scene5 img:active { opacity: 0.85; }
+    #scene5 .tap-hint {
+      position: absolute;
+      bottom: 10vh;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      animation: hintScaleAbs 1.5s ease-in-out infinite alternate;
+    }
+
+    /* ── scene 6: coupons ── */
+    #scene6 { opacity: 0; transition: opacity 0.5s ease-in-out; padding: 24px 0 30px; }
+    #scene6.active { opacity: 1; }
+
+    .coupon-title-text {
+      font-size: 1.5rem;
+      color: #e8728a;
+      margin-top: 24px;
+      margin-bottom: 20px;
+    }
+
+    .carousel-wrap { width: 100vw; overflow: hidden; }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .coupon-slide {
+      min-width: 100vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 28px;
+    }
+
+    .coupon-card {
+      position: relative;
+      width: min(360px, 90vw);
+    }
+    .coupon-card > img {
+      width: 100%;
+      filter: drop-shadow(2px 2px 8px rgba(0,0,0,0.15));
+    }
+
+    .coupon-text {
+      position: absolute;
+      top: 44%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 72%;
+      text-align: center;
+    }
+    .coupon-name {
+      font-size: 0.95rem;
+      color: #5a1e50;
+      line-height: 1.3;
+      margin-bottom: 5px;
+    }
+    .coupon-desc {
+      font-size: 0.72rem;
+      color: #7a3a60;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .coupon-fine {
+      font-size: 0.6rem;
+      color: #9a6080;
+      margin-top: 6px;
+    }
+
+    .dots {
+      display: flex; gap: 10px;
+      justify-content: center;
+      margin-top: 6px;
+    }
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #fdf1e3;
+      border: 2px dashed #8a7dba;
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+    .dot.active { background: #8a7dba; border-style: solid; }
+
+    /* confirm button — sticker style, no gradient */
+    .confirm-btn {
+      margin-top: 22px;
+      padding: 12px 28px;
+      font-family: 'Indie Flower', cursive;
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: transform 0.15s;
+    }
+    .confirm-btn:active { transform: scale(0.95); }
+
+    /* ── svg hearts (same as original) ── */
+    .heart-svg {
+      position: fixed;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .tap-heart {
+      width: 30px; height: 30px;
+      animation: tapHeartAnim 0.7s ease-out forwards;
+    }
+    .bg-heart {
+      width: 50px; height: 50px;
+      animation: bgHeartAnim var(--duration, 1.2s) ease-out forwards;
+    }
+
+    @keyframes tapHeartAnim {
+      0%   { transform: translate(var(--x,0), var(--y,0)) scale(0); opacity: 1; }
+      100% { transform: translate(var(--x,0), calc(var(--y,0) - 80px)) scale(1); opacity: 0; }
+    }
+    @keyframes bgHeartAnim {
+      0%   { transform: translateY(0) scale(0.8); opacity: 0.9; }
+      100% { transform: translateY(-100vh) scale(1.1); opacity: 0; }
+    }
+    @keyframes idleFloat {
+      0%,100% { transform: translateY(0); }
+      50%     { transform: translateY(-12px); }
+    }
+    @keyframes idleBounce {
+      0%   { transform: scaleY(1); }
+      100% { transform: scaleY(1.025); }
+    }
+    @keyframes hintScale {
+      0%   { transform: scale(1); }
+      100% { transform: scale(1.08); }
+    }
+    @keyframes hintScaleAbs {
+      0%   { transform: translateX(-50%) scale(1); }
+      100% { transform: translateX(-50%) scale(1.08); }
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50%     { opacity: 0.4; }
+    }
+    @keyframes wiggle {
+      0%,100% { transform: translateX(-50%) rotate(0deg); }
+      25%     { transform: translateX(-50%) rotate(-4deg); }
+      75%     { transform: translateX(-50%) rotate(4deg); }
+    }
+    .wiggle-3b { animation: wiggle 0.4s ease-in-out; }
+  .back-btn {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 999;
+      font-size: 1.5rem;
+      color: #e8728a;
+      cursor: pointer;
+      text-decoration: none;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .back-btn:active { color: #c0506a; }
+  </style>
+
+  <!-- heart SVG template (same as original) -->
+  <template id="heart-template">
+    <svg class="heart-svg" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15,26 Q2,18 2,9 Q2,3 8,3 Q15,3 15,9 Q15,3 22,3 Q28,3 28,9 Q28,18 15,26Z"
+            fill="#FF69B4" stroke="#c0508a" stroke-width="1.5"/>
+    </svg>
+  </template>
+</head>
+<body>
+  <a class="back-btn" href="../index.html">←</a>
+
+  <!-- SCENE 1 -->
+  <div class="scene active" id="scene1">
+    <img src="images/1.png" alt="rishi-cat" onclick="spawnHeartsAndGo('scene2', event)"/>
+  </div>
+
+  <!-- SCENE 2 -->
+  <div class="scene" id="scene2">
+    <div class="cat-wrap" onclick="spawnHeartsAndGo('scene3', event)">
+      <img src="images/2.png" alt="rishi-cat clipboard"/>
+    </div>
+    <p class="tap-hint">tap to see tonight's plan</p>
+  </div>
+
+  <!-- SCENE 3 -->
+  <div class="scene" id="scene3">
+    <div class="clipboard-stack">
+      <img id="img3b" src="images/3b.png" alt="cat"/>
+      <img id="img3a" src="images/3a.png" alt="clipboard"/>
+      <div id="tick-all-label" style="position:absolute;top:31vh;left:50%;transform:translateX(-50%);z-index:3;font-size:0.75rem;color:#4a2a6a;font-family:'Indie Flower',cursive;font-weight:900;white-space:nowrap;letter-spacing:0.5px;">tick all applicable</div>
+      <div class="checklist-overlay">
+        <div class="check-item" id="item1" onclick="tick(1, event)">
+          <div class="custom-check" id="cc1"></div>
+          <span class="check-label">i would like to be babied tonight after my work is done.</span>
+        </div>
+        <div class="check-item" id="item2" onclick="tick(2, event)">
+          <div class="custom-check" id="cc2"></div>
+          <span class="check-label">take me to meghavi so i can get a relaxing foot massage.</span>
+        </div>
+        <div class="check-item" id="item3" onclick="tick(3, event)">
+          <div class="custom-check" id="cc3"></div>
+          <span class="check-label">feed me butter garlic prawns at exotica until i am completely happy.</span>
+        </div>
+      </div>
+      <div id="sign-label" style="display:none;position:absolute;top:66vh;left:50%;transform:translateX(-50%);width:52vw;max-width:300px;font-size:0.75rem;color:#4a2a6a;font-weight:900;z-index:3;">sign here:</div>
+      <canvas class="sign-area" id="signCanvas" style="display:none;"></canvas>
+    </div>
+  </div>
+
+  <!-- SCENE 4 -->
+  <div class="scene" id="scene4">
+    <img src="images/4.png" alt="cat peeking"/>
+  </div>
+
+  <!-- SCENE 5 -->
+  <div class="scene" id="scene5">
+    <img src="images/5.png" alt="cat tickets" onclick="spawnHeartsAndGo('scene6', event)"/>
+    <p class="tap-hint">tap to collect your tickets</p>
+  </div>
+
+  <!-- SCENE 6 -->
+  <div class="scene" id="scene6">
+    <p class="coupon-title-text">your tickets for tonight ♡</p>
+    <div class="carousel-wrap">
+      <div class="carousel-track" id="carouselTrack">
+        <div class="coupon-slide">
+          <div class="coupon-card">
+            <img src="images/6a.png" alt="coupon"/>
+            <div class="coupon-text">
+              <div class="coupon-name">foot massage</div>
+              <div class="coupon-desc">good for one luxurious foot massage for my hardworking girl.</div>
+            </div>
+          </div>
+        </div>
+        <div class="coupon-slide">
+          <div class="coupon-card">
+            <img src="images/6a.png" alt="coupon"/>
+            <div class="coupon-text">
+              <div class="coupon-name">rooftop dinner</div>
+              <div class="coupon-desc">good for a candlelight dinner and me telling you how pretty you look.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dots">
+      <div class="dot active" onclick="goSlide(0)"></div>
+      <div class="dot" onclick="goSlide(1)"></div>
+    </div>
+    <button class="confirm-btn sticker-style" onclick="sendWhatsApp()">↗ click to send this to rishi to lock it in</button>
+  </div>
+
+<script>
+  const template = document.getElementById('heart-template');
+
+  function createHeart(x, y, isBackground) {
+    const heart = template.content.firstElementChild.cloneNode(true);
+    let duration;
+    if (isBackground) {
+      heart.classList.add('bg-heart');
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.bottom = `-${Math.random() * 100}px`;
+      duration = 1.0 + Math.random() * 0.8;
+      heart.style.setProperty('--duration', `${duration}s`);
+    } else {
+      heart.classList.add('tap-heart');
+      heart.style.left = (x - 15) + 'px';
+      heart.style.top  = (y - 15) + 'px';
+      heart.style.setProperty('--x', (Math.random() * 200 - 100) + 'px');
+      heart.style.setProperty('--y', (Math.random() * -200 - 60) + 'px');
+      duration = 0.7;
+    }
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), duration * 1000);
+  }
+
+  function spawnHearts(x, y) {
+    for (let i = 0; i < 6; i++) createHeart(x, y, false);
+    for (let i = 0; i < 8; i++) createHeart(0, 0, true);
+  }
+
+  function showScene(id) {
+    document.querySelectorAll('.scene').forEach(s => {
+      s.classList.remove('active');
+      s.style.opacity = '';
+      s.style.display = '';
+    });
+    const el = document.getElementById(id);
+    el.classList.add('active');
+    if (id !== 'scene1') {
+      el.style.opacity = '0';
+      requestAnimationFrame(() => requestAnimationFrame(() => { el.style.opacity = '1'; }));
+    }
+  }
+
+  function spawnHeartsAndGo(sceneId, event) {
+    if (event) spawnHearts(event.clientX, event.clientY);
+    showScene(sceneId);
+  }
+
+  // checklist
+  const ticked = {1:false, 2:false, 3:false};
+  let signed = false;
+
+  function tick(n, event) {
+    if (ticked[n]) return;
+    ticked[n] = true;
+    document.getElementById('item'+n).classList.add('checked');
+    if (event) spawnHearts(event.clientX, event.clientY);
+    const cat = document.getElementById('img3b');
+    cat.classList.remove('wiggle-3b');
+    void cat.offsetWidth;
+    cat.classList.add('wiggle-3b');
+    checkComplete();
+  }
+
+  function checkComplete() {
+    if (ticked[1] && ticked[2] && ticked[3]) {
+      // reveal sign area
+      const label  = document.getElementById('sign-label');
+      const canvas = document.getElementById('signCanvas');
+      if (label.style.display === 'none') {
+        label.style.display  = 'block';
+        canvas.style.display = 'block';
+        initCanvas();
+      }
+    }
+    if (ticked[1] && ticked[2] && ticked[3] && signed) {
+      setTimeout(exitClipboard, 400);
+    }
+  }
+
+  function exitClipboard() {
+    const cat      = document.getElementById('img3b');
+    const board    = document.getElementById('img3a');
+    const overlay  = document.querySelector('.checklist-overlay');
+    const signLbl  = document.getElementById('sign-label');
+    const signCvs  = document.getElementById('signCanvas');
+    const tickAll  = document.getElementById('tick-all-label');
+
+    // step 1: fade out text, sign label and canvas
+    overlay.style.transition  = 'opacity 0.4s';
+    signLbl.style.transition  = 'opacity 0.4s';
+    signCvs.style.transition  = 'opacity 0.4s';
+    tickAll.style.transition  = 'opacity 0.4s';
+    overlay.style.opacity     = '0';
+    signLbl.style.opacity     = '0';
+    signCvs.style.opacity     = '0';
+    tickAll.style.opacity     = '0';
+
+    // step 2: after fade, slide both 3a and 3b down together
+    setTimeout(() => {
+      const slideDown = 'translateX(-50%) translateY(110%)';
+      cat.style.transition   = 'transform 0.7s cubic-bezier(0.4,0,0.2,1)';
+      board.style.transition = 'transform 0.7s cubic-bezier(0.4,0,0.2,1)';
+      cat.style.transform    = slideDown;
+      board.style.transform  = slideDown;
+    }, 450);
+
+    // step 3: show scene4
+    setTimeout(() => {
+      showScene('scene4');
+      // after 2s crossfade scene4 → scene5
+      setTimeout(() => {
+        const s4 = document.getElementById('scene4');
+        const s5 = document.getElementById('scene5');
+        s5.style.display = 'flex';
+        s5.style.opacity = '0';
+        s5.classList.add('active');
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          s4.style.transition = 'opacity 0.6s';
+          s5.style.transition = 'opacity 0.6s';
+          s4.style.opacity = '0';
+          s5.style.opacity = '1';
+        }));
+        setTimeout(() => {
+          s4.style.display = 'none';
+          s4.classList.remove('active');
+          // start bounce on scene5 img after fade complete
+          s5.querySelector('img').classList.add('bouncing');
+        }, 700);
+      }, 2000);
+    }, 1300);
+  }
+
+  // signature
+  function initCanvas() {
+    const canvas = document.getElementById('signCanvas');
+    const ctx    = canvas.getContext('2d');
+    const dpr    = window.devicePixelRatio || 1;
+    const w      = canvas.offsetWidth;
+    const h      = canvas.offsetHeight;
+    canvas.width  = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width  = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.scale(dpr, dpr);
+    ctx.strokeStyle = '#4a2a6a';
+    ctx.lineWidth   = 2.5;
+    ctx.lineCap     = 'round';
+    ctx.lineJoin    = 'round';
+
+    let drawing = false, hasStrokes = false, signTimer = null;
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const src  = e.touches ? e.touches[0] : e;
+      return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+    }
+    function startDraw(e) { e.preventDefault(); drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+    function draw(e)      { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasStrokes = true; }
+    function endDraw(e)   {
+      e.preventDefault(); drawing = false;
+      if (hasStrokes) {
+        clearTimeout(signTimer);
+        signTimer = setTimeout(() => {
+          signed = true;
+          spawnHearts(window.innerWidth/2, window.innerHeight/2);
+          checkComplete();
+        }, 800);
+      }
+    }
+    canvas.addEventListener('mousedown',  startDraw);
+    canvas.addEventListener('mousemove',  draw);
+    canvas.addEventListener('mouseup',    endDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove',  draw,      { passive: false });
+    canvas.addEventListener('touchend',   endDraw,   { passive: false });
+  }
+
+  // carousel
+  let currentSlide = 0;
+  function goSlide(n) {
+    currentSlide = n;
+    document.getElementById('carouselTrack').style.transform = `translateX(-${n * 100}vw)`;
+    document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i === n));
+  }
+  let touchStartX = 0;
+  document.getElementById('carouselTrack').addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+  document.getElementById('carouselTrack').addEventListener('touchend',   e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) goSlide(diff > 0 ? 1 : 0);
+  });
+
+  function sendWhatsApp() {
+    const msg = encodeURIComponent("i have signed the very real legally binding document that makes rishi my driver for the night, come get me hehe");
+    window.open(`https://wa.me/918247212263?text=${msg}`, '_blank');
+  }
+</script>
+</body>
+</html>
